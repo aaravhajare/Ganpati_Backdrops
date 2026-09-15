@@ -4,6 +4,7 @@ export const backdrops = [
     name: "Royal Ganpati",
     category: "Traditional",
     video: "/videos/backdrop1.mp4",
+    music: "/music/Shreemant Dagdu Sheth.mp3",
   },
 
   {
@@ -11,6 +12,7 @@ export const backdrops = [
     name: "Divine Glow",
     category: "Divine",
     video: "/videos/backdrop2.mp4",
+    music: "/music/Shreemant Dagdu Sheth.mp3",
   },
 
   {
@@ -18,6 +20,7 @@ export const backdrops = [
     name: "Golden Darbar",
     category: "Royal",
     video: "/videos/backdrop3.mp4",
+    music: "/music/Shreemant Dagdu Sheth.mp3",
   },
 
   {
@@ -25,5 +28,6 @@ export const backdrops = [
     name: "Temple Lights",
     category: "Temple",
     video: "/videos/backdrop4.mp4",
+    music: "/music/GanRaya.mp3",
   },
 ];

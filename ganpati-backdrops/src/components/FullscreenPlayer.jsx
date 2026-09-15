@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-function FullscreenPlayer({
-  backdrop,
-  onClose,
-}) {
+function FullscreenPlayer({ backdrop, onClose }) {
   const playerRef = useRef(null);
   const videoRef = useRef(null);
+  const audioRef = useRef(null);
 
   const [controlsVisible, setControlsVisible] =
     useState(true);
@@ -17,17 +15,33 @@ function FullscreenPlayer({
 
     const player = playerRef.current;
     const video = videoRef.current;
+    const audio = audioRef.current;
 
     if (!player || !video) return;
 
     video.currentTime = 0;
 
-    video.play().catch((error) => {
-      console.log(
-        "Video autoplay was blocked:",
-        error
-      );
-    });
+    if (audio) {
+      audio.currentTime = 0;
+      audio.loop = true;
+    }
+
+    const startPlayback = async () => {
+      try {
+        // Start video
+        await video.play();
+
+        // Start separate music
+        if (audio) {
+          await audio.play();
+        }
+      } catch (error) {
+        console.log(
+          "Playback was blocked by the browser:",
+          error
+        );
+      }
+    };
 
     const enterFullscreen = async () => {
       try {
@@ -45,20 +59,23 @@ function FullscreenPlayer({
       }
     };
 
-    enterFullscreen();
-
-    document.body.classList.add(
-      "player-open"
-    );
+    document.body.classList.add("player-open");
 
     showControls();
 
+    startPlayback();
+    enterFullscreen();
+
     return () => {
       video.pause();
+      video.currentTime = 0;
 
-      document.body.classList.remove(
-        "player-open"
-      );
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+
+      document.body.classList.remove("player-open");
 
       clearTimeout(hideTimer.current);
     };
@@ -76,18 +93,30 @@ function FullscreenPlayer({
 
   async function closePlayer() {
     const video = videoRef.current;
+    const audio = audioRef.current;
 
+    // Stop video
     if (video) {
       video.pause();
       video.currentTime = 0;
     }
 
+    // Stop separate music
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+
+    // Exit browser fullscreen
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
       }
     } catch (error) {
-      console.log(error);
+      console.log(
+        "Could not exit fullscreen:",
+        error
+      );
     }
 
     onClose();
@@ -115,16 +144,11 @@ function FullscreenPlayer({
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      /*
-        Browser fullscreen was manually exited.
-        Close the backdrop too.
-      */
-
       if (
         !document.fullscreenElement &&
         playerRef.current
       ) {
-        onClose();
+        closePlayer();
       }
     };
 
@@ -139,7 +163,7 @@ function FullscreenPlayer({
         handleFullscreenChange
       );
     };
-  }, [onClose]);
+  });
 
   if (!backdrop) return null;
 
@@ -150,7 +174,7 @@ function FullscreenPlayer({
       onMouseMove={showControls}
       onTouchStart={showControls}
     >
-
+      {/* Background video */}
       <video
         ref={videoRef}
         src={backdrop.video}
@@ -160,16 +184,23 @@ function FullscreenPlayer({
         playsInline
       />
 
+      {/* Separate background music */}
+      {backdrop.music && (
+        <audio
+          ref={audioRef}
+          src={backdrop.music}
+          loop
+          preload="auto"
+        />
+      )}
+
+      {/* Player interface */}
       <div
         className={`player-ui ${
-          controlsVisible
-            ? "visible"
-            : ""
+          controlsVisible ? "visible" : ""
         }`}
       >
-
         <div className="player-topbar">
-
           <div className="playing-info">
             <span className="live-dot"></span>
 
@@ -191,11 +222,9 @@ function FullscreenPlayer({
           >
             <span>×</span>
           </button>
-
         </div>
 
         <div className="player-bottom">
-
           <div className="loop-indicator">
             <span>↻</span>
             LOOPING
@@ -208,11 +237,8 @@ function FullscreenPlayer({
             <span>✕</span>
             Exit Backdrop
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }
