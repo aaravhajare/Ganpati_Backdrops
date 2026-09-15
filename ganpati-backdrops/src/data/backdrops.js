@@ -30,4 +30,12 @@ export const backdrops = [
     video: "/videos/backdrop4.mp4",
     music: "/music/GanRaya.mp3",
   },
+
+  {
+    id: 5,
+    name: "Chakra",
+    category: "Temple",
+    video: "/videos/backdrop5.mp4",
+    music: "/music/GanRaya.mp3",
+  },
 ];
