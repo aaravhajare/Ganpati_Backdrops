@@ -38,4 +38,12 @@ export const backdrops = [
     video: "/videos/backdrop5.mp4",
     music: "/music/GanRaya.mp3",
   },
+
+  {
+    id: 6,
+    name: "Ganraya",
+    category: "bd4",
+    video: "/videos/backdrop4.mp3",
+    music: "/music/GanRaya.mp3",
+  },
 ];
